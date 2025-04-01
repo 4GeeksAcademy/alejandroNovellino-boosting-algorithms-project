@@ -3,6 +3,7 @@ Utility functions for Markdown elements.
 """
 
 import numpy as np
+import numpy.typing as npt
 from IPython.core.display_functions import display
 from IPython.display import Markdown
 
@@ -34,5 +35,40 @@ def show_comparison_table(metric_names: list[str], default_metrics: list[float],
 
     # display the table
     display(Markdown(markdown_table))
+
+    return None
+
+
+def show_confusion_matrix_analysis(confusion_matrix: npt.NDArray[np.float64], positive_label_meaning: str, negative_label_meaning: str) -> None:
+    """
+    Creates and show a Markdown table comparing default and optimized model metrics.
+
+    Args:
+        confusion_matrix (npt.NDArray[np.float64]): Confusion matrix to show analysis, this matrix comes from the
+            sklearn metrics functions.
+        positive_label_meaning (str): Meaning of the positive (1) label in the confusion matrix.
+        negative_label_meaning (str): Meaning of the negative (0) label in the confusion matrix.
+
+    Returns:
+        str: A Markdown table as a string.
+
+    Raise:
+        Exception: the metrics length is different from the default or optimized metrics.
+    """
+
+    try:
+        analysis = f'''
+        The interpretation of a confusion matrix is as follows:
+
+            - **True positive (TP)**: corresponds to the number **({confusion_matrix[1][1]})** and are the cases where the model predicted positive **({positive_label_meaning})** and the actual class is also positive.
+            - **True negative (TN)**: Corresponds to the number **({confusion_matrix[0][0]})** and are the cases where the model predicted negative **({negative_label_meaning})** and the actual class is also negative.
+            - **False positive (FP)**: Corresponds to the number **({confusion_matrix[0][1]})** and are the cases in which the model predicted positive, but the actual class is negative.
+            - **False negative (FN)**: Corresponds to the number **({confusion_matrix[1][0]})** and are the cases where the model predicted negative, but the actual class is positive.
+        '''
+
+        # display the table
+        display(Markdown(analysis))
+    except:
+        display(Markdown('Error: The confusion matrix is not a 2x2 numpy array.'))
 
     return None
